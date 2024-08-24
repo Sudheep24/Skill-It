@@ -9,6 +9,7 @@ import LoginScreen from './Components/LoginScreen';
 import MultiPageForm from './Components/MultiPageForm';
 import HomeScreen from './Components/HomeScreen';
 import { name as appName } from './app.json';
+import ProfileScreen from './Components/ProfilePage';
 
 const auth = getAuth();
 const db = getFirestore();
@@ -56,6 +57,7 @@ const App = () => {
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="MultiPageForm" component={MultiPageForm} />
         <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

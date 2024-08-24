@@ -3,14 +3,16 @@ import { View, Text, StyleSheet, Button, TouchableOpacity, Modal, ScrollView, Im
 import JobList from './JobList';
 import { getAuth, signOut } from 'firebase/auth';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
+import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook for navigation
 
 const auth = getAuth();
 const db = getFirestore();
 
-const HomeScreen = ({ navigation }) => {
+const HomeScreen = () => {
   const [userData, setUserData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
+  const navigation = useNavigation(); // Initialize navigation
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
 
   const handleProfileOptionPress = () => {
     setDropdownVisible(false);
-    navigation.navigate('Profile');
+    navigation.navigate('Profile'); // Navigate to Profile page
   };
 
   const handleSignOut = async () => {
@@ -50,7 +52,7 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.navBar}>
         <TouchableOpacity style={styles.profileButton} onPress={handleProfilePhotoPress}>
           {/* Display user profile photo here */}
-          <Image source={{ uri: 'https://example.com/profile-photo.jpg' }} style={styles.profileImage} />
+          <Image source={{ uri: userData?.profilePhoto || 'https://example.com/default-profile-photo.jpg' }} style={styles.profileImage} />
         </TouchableOpacity>
         {dropdownVisible && (
           <View style={styles.dropdownMenu}>
@@ -106,7 +108,7 @@ const styles = StyleSheet.create({
   },
   navBar: {
     flexDirection: 'row',
-    justifyContent: 'space-between', // Changed from 'flex-end' to 'space-between' to accommodate Logout button
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 10,
   },
@@ -128,6 +130,7 @@ const styles = StyleSheet.create({
     padding: 10,
     elevation: 5,
     width: 150,
+    zIndex: 1, // Ensure dropdown is on top
   },
   dropdownItem: {
     paddingVertical: 10,
