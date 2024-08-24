@@ -1,308 +1,273 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { FontAwesome } from '@expo/vector-icons'; // For logout icon
 import { getAuth, signOut } from 'firebase/auth';
+import { doc, setDoc, getFirestore } from 'firebase/firestore';
+import Navbar from './NavBar';
 
-// Initialize Firebase Auth (assuming Firebase config is already set up elsewhere)
 const auth = getAuth();
+const db = getFirestore();
+
+const LoadingScreen = () => (
+  <View style={styles.loadingScreen}>
+    <ActivityIndicator size="large" color="#fff" />
+    <Text style={styles.loadingText}>Submitting...</Text>
+  </View>
+);
 
 const MultiPageForm = () => {
   const navigation = useNavigation();
   const [currentPage, setCurrentPage] = useState(1);
-  const [personalDetails, setPersonalDetails] = useState({
-    name: '',
-    email: '',
-    dob: '',
-    phone: '',
+  const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    personalDetails: { name: '', email: '', dob: '', phone: '' },
+    education10th: { marks: '', maths: '', physics: '', chemistry: '' },
+    education12th: { marks: '', maths: '', physics: '', chemistry: '' },
+    collegeDetails: { collegeName: '', courseBranch: '', course: '', cgpa: '' },
+    skills: [''],
+    interests: [''],
   });
-  const [education10th, setEducation10th] = useState({
-    marks: '',
-    maths: '',
-    physics: '',
-    chemistry: '',
-  });
-  const [education12th, setEducation12th] = useState({
-    marks: '',
-    maths: '',
-    physics: '',
-    chemistry: '',
-  });
-  const [collegeDetails, setCollegeDetails] = useState({
-    collegeName: '',
-    courseBranch: '',
-    course: '',
-    cgpa: '',
-  });
-  const [skills, setSkills] = useState(['']);
-  const [interests, setInterests] = useState(['']);
 
-  const handleNext = () => {
-    setCurrentPage(currentPage + 1);
+  const handleChange = (section, field, value) => {
+    setFormData((prev) => ({
+      ...prev,
+      [section]: { ...prev[section], [field]: value },
+    }));
   };
 
-  const handlePrevious = () => {
-    setCurrentPage(currentPage - 1);
-  };
+  const handleNext = () => setCurrentPage((prev) => prev + 1);
+  const handlePrevious = () => setCurrentPage((prev) => prev - 1);
 
-  const handleSubmit = () => {
-    // Handle form submission here
-    console.log({
-      personalDetails,
-      education10th,
-      education12th,
-      collegeDetails,
-      skills,
-      interests,
-    });
-    navigation.navigate('Home');
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    try {
+      await setDoc(doc(db, 'users', auth.currentUser.uid), formData);
+      console.log('Data submitted:', formData);
+      setIsLoading(false);
+      navigation.navigate('Home');
+    } catch (error) {
+      console.error('Error adding document: ', error);
+      setIsLoading(false);
+      // You might want to show an error message to the user here
+    }
   };
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigation.navigate('Login'); // Navigate to the Login route
+      navigation.navigate('Login');
     } catch (error) {
       console.error('Logout Error:', error);
     }
   };
 
-  return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Logout Button */}
-      <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-        <FontAwesome name="sign-out" size={24} color="#fff" />
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
+  const renderPageContent = () => {
+    const { personalDetails, education10th, education12th, collegeDetails, skills, interests } = formData;
+    switch (currentPage) {
+      case 1:
+        return (
+          <FormSection title="Personal Details">
+            {Object.entries(personalDetails).map(([key, value]) => (
+              <FormInput key={key} placeholder={capitalize(key)} value={value} onChangeText={(text) => handleChange('personalDetails', key, text)} />
+            ))}
+            <FormNavigation onNext={handleNext} />
+          </FormSection>
+        );
+      case 2:
+        return (
+          <FormSection title="10th Grade Details">
+            {Object.entries(education10th).map(([key, value]) => (
+              <FormInput key={key} placeholder={capitalize(key)} value={value} onChangeText={(text) => handleChange('education10th', key, text)} />
+            ))}
+            <FormNavigation onNext={handleNext} onPrevious={handlePrevious} />
+          </FormSection>
+        );
+      case 3:
+        return (
+          <FormSection title="12th Grade Details">
+            {Object.entries(education12th).map(([key, value]) => (
+              <FormInput key={key} placeholder={capitalize(key)} value={value} onChangeText={(text) => handleChange('education12th', key, text)} />
+            ))}
+            <FormNavigation onNext={handleNext} onPrevious={handlePrevious} />
+          </FormSection>
+        );
+      case 4:
+        return (
+          <FormSection title="College Details">
+            {Object.entries(collegeDetails).map(([key, value]) => (
+              <FormInput key={key} placeholder={capitalize(key)} value={value} onChangeText={(text) => handleChange('collegeDetails', key, text)} />
+            ))}
+            <FormNavigation onNext={handleNext} onPrevious={handlePrevious} />
+          </FormSection>
+        );
+      case 5:
+        return (
+          <FormSection title="Skills & Interests">
+            {skills.map((skill, index) => (
+              <FormInput
+                key={index}
+                placeholder={`Skill ${index + 1}`}
+                value={skill}
+                onChangeText={(text) => {
+                  const newSkills = [...skills];
+                  newSkills[index] = text;
+                  setFormData({ ...formData, skills: newSkills });
+                }}
+              />
+            ))}
+            <AddButton onPress={() => setFormData({ ...formData, skills: [...skills, ''] })} text="+ Add Skill" />
+            {interests.map((interest, index) => (
+              <FormInput
+                key={index}
+                placeholder={`Interest ${index + 1}`}
+                value={interest}
+                onChangeText={(text) => {
+                  const newInterests = [...interests];
+                  newInterests[index] = text;
+                  setFormData({ ...formData, interests: newInterests });
+                }}
+              />
+            ))}
+            <AddButton onPress={() => setFormData({ ...formData, interests: [...interests, ''] })} text="+ Add Interest" />
+            <FormNavigation onSubmit={handleSubmit} onPrevious={handlePrevious} />
+          </FormSection>
+        );
+      default:
+        return null;
+    }
+  };
 
-      {currentPage === 1 && (
-        <View style={styles.page}>
-          <Text style={styles.title}>Personal Details</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Name"
-            value={personalDetails.name}
-            onChangeText={(text) => setPersonalDetails({ ...personalDetails, name: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Official Email ID"
-            value={personalDetails.email}
-            onChangeText={(text) => setPersonalDetails({ ...personalDetails, email: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Date of Birth"
-            value={personalDetails.dob}
-            onChangeText={(text) => setPersonalDetails({ ...personalDetails, dob: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Phone Number"
-            value={personalDetails.phone}
-            onChangeText={(text) => setPersonalDetails({ ...personalDetails, phone: text })}
-          />
-          <View style={styles.buttonContainer}>
-            <Button title="Next" onPress={handleNext} />
-          </View>
-        </View>
-      )}
-      {currentPage === 2 && (
-        <View style={styles.page}>
-          <Text style={styles.title}>10th Grade Details</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Marks"
-            value={education10th.marks}
-            onChangeText={(text) => setEducation10th({ ...education10th, marks: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Maths"
-            value={education10th.maths}
-            onChangeText={(text) => setEducation10th({ ...education10th, maths: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Physics"
-            value={education10th.physics}
-            onChangeText={(text) => setEducation10th({ ...education10th, physics: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Chemistry"
-            value={education10th.chemistry}
-            onChangeText={(text) => setEducation10th({ ...education10th, chemistry: text })}
-          />
-          <View style={styles.buttonContainer}>
-            <Button title="Previous" onPress={handlePrevious} />
-            <Button title="Next" onPress={handleNext} />
-          </View>
-        </View>
-      )}
-      {currentPage === 3 && (
-        <View style={styles.page}>
-          <Text style={styles.title}>12th Grade Details</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Marks"
-            value={education12th.marks}
-            onChangeText={(text) => setEducation12th({ ...education12th, marks: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Maths"
-            value={education12th.maths}
-            onChangeText={(text) => setEducation12th({ ...education12th, maths: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Physics"
-            value={education12th.physics}
-            onChangeText={(text) => setEducation12th({ ...education12th, physics: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Chemistry"
-            value={education12th.chemistry}
-            onChangeText={(text) => setEducation12th({ ...education12th, chemistry: text })}
-          />
-          <View style={styles.buttonContainer}>
-            <Button title="Previous" onPress={handlePrevious} />
-            <Button title="Next" onPress={handleNext} />
-          </View>
-        </View>
-      )}
-      {currentPage === 4 && (
-        <View style={styles.page}>
-          <Text style={styles.title}>College Details</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="College Name"
-            value={collegeDetails.collegeName}
-            onChangeText={(text) => setCollegeDetails({ ...collegeDetails, collegeName: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Course Branch"
-            value={collegeDetails.courseBranch}
-            onChangeText={(text) => setCollegeDetails({ ...collegeDetails, courseBranch: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Course"
-            value={collegeDetails.course}
-            onChangeText={(text) => setCollegeDetails({ ...collegeDetails, course: text })}
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="CGPA"
-            value={collegeDetails.cgpa}
-            onChangeText={(text) => setCollegeDetails({ ...collegeDetails, cgpa: text })}
-          />
-          <View style={styles.buttonContainer}>
-            <Button title="Previous" onPress={handlePrevious} />
-            <Button title="Next" onPress={handleNext} />
-          </View>
-        </View>
-      )}
-      {currentPage === 5 && (
-        <View style={styles.page}>
-          <Text style={styles.title}>Skills & Interests</Text>
-          {skills.map((skill, index) => (
-            <TextInput
-              key={index}
-              style={styles.input}
-              placeholder={`Skill ${index + 1}`}
-              value={skill}
-              onChangeText={(text) => {
-                const newSkills = [...skills];
-                newSkills[index] = text;
-                setSkills(newSkills);
-              }}
-            />
-          ))}
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setSkills([...skills, ''])}
-          >
-            <Text style={styles.addButtonText}>+ Add Skill</Text>
-          </TouchableOpacity>
-          {interests.map((interest, index) => (
-            <TextInput
-              key={index}
-              style={styles.input}
-              placeholder={`Interest ${index + 1}`}
-              value={interest}
-              onChangeText={(text) => {
-                const newInterests = [...interests];
-                newInterests[index] = text;
-                setInterests(newInterests);
-              }}
-            />
-          ))}
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => setInterests([...interests, ''])}
-          >
-            <Text style={styles.addButtonText}>+ Add Interest</Text>
-          </TouchableOpacity>
-          <View style={styles.buttonContainer}>
-            <Button title="Previous" onPress={handlePrevious} />
-            <Button title="Submit" onPress={handleSubmit} />
-          </View>
-        </View>
-      )}
-    </ScrollView>
+  return (
+    <View style={styles.container}>
+      <Navbar onLogout={handleLogout} />
+      <View style={styles.centerContainer}>
+        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
+          {renderPageContent()}
+        </ScrollView>
+      </View>
+      {isLoading && <LoadingScreen />}
+    </View>
   );
 };
+
+const FormSection = ({ title, children }) => (
+  <View style={styles.page}>
+    <Text style={styles.title}>{title}</Text>
+    {children}
+  </View>
+);
+
+const FormInput = ({ placeholder, value, onChangeText }) => (
+  <TextInput style={styles.input} placeholder={placeholder} placeholderTextColor="#7F7F7F" value={value} onChangeText={onChangeText} />
+);
+
+const FormNavigation = ({ onNext, onPrevious, onSubmit }) => (
+  <View style={styles.buttonContainer}>
+    {onPrevious && (
+      <TouchableOpacity style={styles.navButton} onPress={onPrevious}>
+        <Text style={styles.navButtonText}>Previous</Text>
+      </TouchableOpacity>
+    )}
+    {onNext && (
+      <TouchableOpacity style={styles.navButton} onPress={onNext}>
+        <Text style={styles.navButtonText}>Next</Text>
+      </TouchableOpacity>
+    )}
+    {onSubmit && (
+      <TouchableOpacity style={styles.navButton} onPress={onSubmit}>
+        <Text style={styles.navButtonText}>Submit</Text>
+      </TouchableOpacity>
+    )}
+  </View>
+);
+
+const AddButton = ({ onPress, text }) => (
+  <TouchableOpacity style={styles.addButton} onPress={onPress}>
+    <Text style={styles.addButtonText}>{text}</Text>
+  </TouchableOpacity>
+);
+
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff', // Ensure background color matches the login page
+    backgroundColor: '#000',
   },
-  logoutButton: {
-    flexDirection: 'row',
+  centerContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#007BFF', // Use primary color or matching color from login page
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 20,
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    zIndex: 1,
   },
-  logoutText: {
-    color: '#fff', // Ensure text color matches the button color
-    marginLeft: 5,
+  scrollViewContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
   },
   page: {
+    width: '80%',
+    alignItems: 'center',
     marginVertical: 10,
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 10,
+    color: '#fff',
+    marginBottom: 20,
   },
   input: {
+    width: '100%',
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+    borderColor: '#3E3E3E',
+    borderRadius: 8,
     padding: 10,
     marginBottom: 10,
+    color: '#fff',
+    backgroundColor: '#1C1C1C',
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    width: '100%',
+  },
+  navButton: {
+    backgroundColor: '#393939',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  navButtonText: {
+    color: '#fff',
+    fontSize: 16,
   },
   addButton: {
-    marginVertical: 10,
+    backgroundColor: '#1C1C1C',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginVertical: 5,
   },
   addButtonText: {
-    color: 'blue',
+    color: '#fff',
+    fontSize: 14,
+  },
+  loadingScreen: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    color: '#fff',
+    marginTop: 10,
     fontSize: 16,
   },
 });
