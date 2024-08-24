@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Button, TouchableOpacity, Modal, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView, Image } from 'react-native';
 import JobList from './JobList';
+import GuidanceComponent from './GuidanceComponent'; // Import the new component for guidance
 import { getAuth, signOut } from 'firebase/auth';
 import { doc, getDoc, getFirestore } from 'firebase/firestore';
-import { useNavigation } from '@react-navigation/native'; // Import useNavigation hook for navigation
+import { useNavigation } from '@react-navigation/native';
 
 const auth = getAuth();
 const db = getFirestore();
@@ -12,7 +13,8 @@ const HomeScreen = () => {
   const [userData, setUserData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const navigation = useNavigation(); // Initialize navigation
+  const [selectedTab, setSelectedTab] = useState('recommendation'); // State for selected tab
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,7 +37,7 @@ const HomeScreen = () => {
 
   const handleProfileOptionPress = () => {
     setDropdownVisible(false);
-    navigation.navigate('Profile'); // Navigate to Profile page
+    navigation.navigate('Profile');
   };
 
   const handleSignOut = async () => {
@@ -51,7 +53,6 @@ const HomeScreen = () => {
     <View style={styles.container}>
       <View style={styles.navBar}>
         <TouchableOpacity style={styles.profileButton} onPress={handleProfilePhotoPress}>
-          {/* Display user profile photo here */}
           <Image source={{ uri: userData?.profilePhoto || 'https://example.com/default-profile-photo.jpg' }} style={styles.profileImage} />
         </TouchableOpacity>
         {dropdownVisible && (
@@ -69,10 +70,24 @@ const HomeScreen = () => {
         </TouchableOpacity>
       </View>
 
-      <Text style={styles.title}>Job Recommendations</Text>
-      <JobList />
+      <View style={styles.tabContainer}>
+        <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('recommendation')}>
+          <Text style={[styles.tabText, selectedTab === 'recommendation' && styles.selectedTab]}>Recommendation</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.tabButton} onPress={() => setSelectedTab('guidance')}>
+          <Text style={[styles.tabText, selectedTab === 'guidance' && styles.selectedTab]}>Guidance</Text>
+        </TouchableOpacity>
+      </View>
 
-      {/* Modal for user details */}
+      {selectedTab === 'recommendation' ? (
+        <>
+         
+          <JobList />
+        </>
+      ) : (
+        <GuidanceComponent />
+      )}
+
       <Modal
         animationType="slide"
         transparent={true}
@@ -87,7 +102,6 @@ const HomeScreen = () => {
                 <Text style={styles.modalText}>Name: {userData.personalDetails?.name}</Text>
                 <Text style={styles.modalText}>Email: {userData.personalDetails?.email}</Text>
                 <Text style={styles.modalText}>Date of Birth: {userData.personalDetails?.dob}</Text>
-                {/* Add more fields as needed */}
               </View>
             )}
             <TouchableOpacity style={styles.modalButton} onPress={() => setModalVisible(false)}>
@@ -123,14 +137,13 @@ const styles = StyleSheet.create({
   },
   dropdownMenu: {
     position: 'absolute',
-    top: 50,
-    right: 20,
+    top: 60,
     backgroundColor: 'white',
     borderRadius: 5,
     padding: 10,
     elevation: 5,
     width: 150,
-    zIndex: 1, // Ensure dropdown is on top
+    zIndex: 1,
   },
   dropdownItem: {
     paddingVertical: 10,
@@ -144,6 +157,30 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     fontSize: 16,
+    color: 'white',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 10,
+    gap: 50,
+  },
+  tabButton: {
+    marginHorizontal: 10,
+  },
+  tabText: {
+    fontSize: 18,
+    color: 'white',
+     paddingTop: 4, 
+  },
+  selectedTab: {
+    textDecorationLine: 'underline',
+    textDecorationColor: '#0FC2C0', // Change this to your desired underline color
+   // Add padding between the text and the underline
+  },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
     color: 'white',
   },
   modalContainer: {
@@ -174,11 +211,6 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: 'white',
     fontSize: 16,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    color: 'white',
   },
 });
 
