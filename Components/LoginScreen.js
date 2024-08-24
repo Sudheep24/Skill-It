@@ -2,47 +2,58 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { FontAwesome } from '@expo/vector-icons'; // For back arrow icon
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, initializeAuth, getReactNativePersistence } from 'firebase/auth';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyAgq4SskmQElLpZbffEfahr7_meuLwEoYw",
-  authDomain: "skill-it-33ebb.firebaseapp.com",
-  projectId: "skill-it-33ebb",
-  storageBucket: "skill-it-33ebb.appspot.com",
-  messagingSenderId: "1050592758957",
-  appId: "1:1050592758957:web:ea89e434ef286f93734a24",
-  measurementId: "G-K2RMZWE854"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage)
-});
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from 'firebase/auth';
+import { auth, db } from './firebaseConfig.js'; // Import Firebase configuration
+import { doc, getDoc } from 'firebase/firestore';
+import SplashScreen from './SplashScreen'; // Import or create a SplashScreen component
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [initialRoute, setInitialRoute] = useState('Login');
 
   useEffect(() => {
-    const checkUser = async () => {
-      const user = auth.currentUser;
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        navigation.navigate('MultiPageForm');
-      }
-    };
+        try {
+          const userDoc = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(userDoc);
 
-    checkUser();
-  }, [navigation]);
+          if (docSnap.exists()) {
+            const data = docSnap.data();
+            if (data && data.formSubmitted) {
+              setInitialRoute('Home');
+            } else {
+              setInitialRoute('MultiPageForm');
+            }
+          } else {
+            setInitialRoute('MultiPageForm'); // Default to MultiPageForm if no user data exists
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          setInitialRoute('MultiPageForm');
+        }
+        setLoading(false);
+      } else {
+        setInitialRoute('Login');
+        setLoading(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      navigation.navigate(initialRoute);
+    }
+  }, [loading, initialRoute, navigation]);
 
   const handleSignIn = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigation.navigate('MultiPageForm');
     } catch (error) {
       console.error('Sign In Error:', error);
       if (error.code === 'auth/user-not-found') {
@@ -60,12 +71,15 @@ const LoginScreen = () => {
   const handleRegister = async () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      navigation.navigate('MultiPageForm');
     } catch (error) {
       console.error('Register Error:', error);
       alert('Failed to register. Please check your credentials.');
     }
   };
+
+  if (loading) {
+    return <SplashScreen />; // Or any other loading indicator
+  }
 
   return (
     <View style={styles.container}>

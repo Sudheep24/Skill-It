@@ -38,19 +38,36 @@ const MultiPageForm = () => {
   const handleNext = () => setCurrentPage((prev) => prev + 1);
   const handlePrevious = () => setCurrentPage((prev) => prev - 1);
 
-  const handleSubmit = async () => {
-    setIsLoading(true);
-    try {
-      await setDoc(doc(db, 'users', auth.currentUser.uid), formData);
-      console.log('Data submitted:', formData);
-      setIsLoading(false);
-      navigation.navigate('Home');
-    } catch (error) {
-      console.error('Error adding document: ', error);
-      setIsLoading(false);
-      // You might want to show an error message to the user here
+const handleSubmit = async () => {
+  setIsLoading(true);
+  try {
+    const user = auth.currentUser;
+    if (!user) {
+      throw new Error('User is not authenticated.');
     }
-  };
+
+    // Verify that formData is defined and contains required fields
+    console.log('Form Data:', formData);
+
+    // Check if `formData` has required fields
+    if (!formData || !formData.someField) {
+      throw new Error('Form data is incomplete.');
+    }
+
+    const userRef = doc(db, 'users', user.uid);
+    await setDoc(userRef, { ...formData, formSubmitted: true }, { merge: true });
+
+    console.log('Data submitted:', formData);
+
+    navigation.navigate('Home');
+  } catch (error) {
+    console.error('Error adding document: ', error);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
 
   const handleLogout = async () => {
     try {
