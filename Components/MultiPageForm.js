@@ -38,36 +38,37 @@ const MultiPageForm = () => {
   const handleNext = () => setCurrentPage((prev) => prev + 1);
   const handlePrevious = () => setCurrentPage((prev) => prev - 1);
 
-const handleSubmit = async () => {
-  setIsLoading(true);
-  try {
-    const user = auth.currentUser;
-    if (!user) {
-      throw new Error('User is not authenticated.');
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error('User is not authenticated.');
+      }
+
+      // Verify that all fields are filled
+      const allFieldsFilled = Object.values(formData).every((section) =>
+        Array.isArray(section)
+          ? section.every((item) => item.trim() !== '')
+          : Object.values(section).every((field) => field.trim() !== '')
+      );
+
+      if (!allFieldsFilled) {
+        throw new Error('Form data is incomplete.');
+      }
+
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, { ...formData, formSubmitted: true }, { merge: true });
+
+      console.log('Data submitted:', formData);
+
+      navigation.navigate('Home');
+    } catch (error) {
+      console.error('Error adding document: ', error);
+    } finally {
+      setIsLoading(false);
     }
-
-    // Verify that formData is defined and contains required fields
-    console.log('Form Data:', formData);
-
-    // Check if `formData` has required fields
-    if (!formData || !formData.someField) {
-      throw new Error('Form data is incomplete.');
-    }
-
-    const userRef = doc(db, 'users', user.uid);
-    await setDoc(userRef, { ...formData, formSubmitted: true }, { merge: true });
-
-    console.log('Data submitted:', formData);
-
-    navigation.navigate('Home');
-  } catch (error) {
-    console.error('Error adding document: ', error);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
+  };
 
   const handleLogout = async () => {
     try {
@@ -85,7 +86,12 @@ const handleSubmit = async () => {
         return (
           <FormSection title="Personal Details">
             {Object.entries(personalDetails).map(([key, value]) => (
-              <FormInput key={key} placeholder={capitalize(key)} value={value} onChangeText={(text) => handleChange('personalDetails', key, text)} />
+              <FormInput
+                key={key}
+                placeholder={capitalize(key)}
+                value={value}
+                onChangeText={(text) => handleChange('personalDetails', key, text)}
+              />
             ))}
             <FormNavigation onNext={handleNext} />
           </FormSection>
@@ -94,7 +100,12 @@ const handleSubmit = async () => {
         return (
           <FormSection title="10th Grade Details">
             {Object.entries(education10th).map(([key, value]) => (
-              <FormInput key={key} placeholder={capitalize(key)} value={value} onChangeText={(text) => handleChange('education10th', key, text)} />
+              <FormInput
+                key={key}
+                placeholder={capitalize(key)}
+                value={value}
+                onChangeText={(text) => handleChange('education10th', key, text)}
+              />
             ))}
             <FormNavigation onNext={handleNext} onPrevious={handlePrevious} />
           </FormSection>
@@ -103,7 +114,12 @@ const handleSubmit = async () => {
         return (
           <FormSection title="12th Grade Details">
             {Object.entries(education12th).map(([key, value]) => (
-              <FormInput key={key} placeholder={capitalize(key)} value={value} onChangeText={(text) => handleChange('education12th', key, text)} />
+              <FormInput
+                key={key}
+                placeholder={capitalize(key)}
+                value={value}
+                onChangeText={(text) => handleChange('education12th', key, text)}
+              />
             ))}
             <FormNavigation onNext={handleNext} onPrevious={handlePrevious} />
           </FormSection>
@@ -112,7 +128,12 @@ const handleSubmit = async () => {
         return (
           <FormSection title="College Details">
             {Object.entries(collegeDetails).map(([key, value]) => (
-              <FormInput key={key} placeholder={capitalize(key)} value={value} onChangeText={(text) => handleChange('collegeDetails', key, text)} />
+              <FormInput
+                key={key}
+                placeholder={capitalize(key)}
+                value={value}
+                onChangeText={(text) => handleChange('collegeDetails', key, text)}
+              />
             ))}
             <FormNavigation onNext={handleNext} onPrevious={handlePrevious} />
           </FormSection>
@@ -175,7 +196,13 @@ const FormSection = ({ title, children }) => (
 );
 
 const FormInput = ({ placeholder, value, onChangeText }) => (
-  <TextInput style={styles.input} placeholder={placeholder} placeholderTextColor="#7F7F7F" value={value} onChangeText={onChangeText} />
+  <TextInput
+    style={styles.input}
+    placeholder={placeholder}
+    placeholderTextColor="#7F7F7F"
+    value={value}
+    onChangeText={onChangeText}
+  />
 );
 
 const FormNavigation = ({ onNext, onPrevious, onSubmit }) => (
@@ -239,38 +266,34 @@ const styles = StyleSheet.create({
     borderColor: '#3E3E3E',
     borderRadius: 8,
     padding: 10,
-    marginBottom: 10,
     color: '#fff',
-    backgroundColor: '#1C1C1C',
+    marginBottom: 15,
   },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    marginTop: 20,
   },
   navButton: {
-    backgroundColor: '#393939',
-    paddingVertical: 10,
+    backgroundColor: '#00b894',
+    paddingVertical: 12,
     paddingHorizontal: 20,
-    borderRadius: 25,
-    alignItems: 'center',
-    marginTop: 10,
+    borderRadius: 8,
   },
   navButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontWeight: 'bold',
   },
   addButton: {
-    backgroundColor: '#1C1C1C',
+    backgroundColor: '#0984e3',
     paddingVertical: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 20,
     borderRadius: 8,
-    alignItems: 'center',
-    marginVertical: 5,
+    marginTop: 10,
   },
   addButtonText: {
     color: '#fff',
-    fontSize: 14,
   },
   loadingScreen: {
     position: 'absolute',
@@ -285,7 +308,6 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#fff',
     marginTop: 10,
-    fontSize: 16,
   },
 });
 

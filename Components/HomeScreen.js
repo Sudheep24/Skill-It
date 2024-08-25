@@ -48,6 +48,9 @@ const HomeScreen = () => {
       console.error('Sign Out Error: ', error);
     }
   };
+  const handle =async() =>{
+    navigation.navigate('Predict')
+  }
 
   return (
     <View style={styles.container}>
@@ -67,6 +70,9 @@ const HomeScreen = () => {
         )}
         <TouchableOpacity style={styles.logoutButton} onPress={handleSignOut}>
           <Text style={styles.logoutText}>Logout</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.logoutButton} onPress={handle}>
+          <Text style={styles.logoutText}>predict</Text>
         </TouchableOpacity>
       </View>
 
