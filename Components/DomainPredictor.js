@@ -5,9 +5,9 @@ import ProgressBar from 'react-native-progress/Bar';
 
 const DomainPredictor = () => {
   const defaultValues = {
-    currentSkills: '34',
-    aptitudeScore: '90',
-    mathMarks: '78',
+    currentSkills: '9', 
+    aptitudeScore: '9',
+    mathMarks: '70',
     scienceMarks: '100',
     interestsGoals: '2',
   };

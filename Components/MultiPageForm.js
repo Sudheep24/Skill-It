@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getAuth, signOut } from 'firebase/auth';
+import { Picker } from '@react-native-picker/picker';
+
 import { doc, setDoc, getFirestore } from 'firebase/firestore';
 import Navbar from './NavBar';
 
@@ -35,6 +37,9 @@ const MultiPageForm = () => {
     }));
   };
 
+  const skillsList = ['JavaScript', 'React Native', 'Python', 'Django', 'Machine Learning'];
+  const interestsList = ['Full Stack Developer', 'SDE', 'DevOps Engineer', 'Cloud Engineer'];
+
   const handleNext = () => setCurrentPage((prev) => prev + 1);
   const handlePrevious = () => setCurrentPage((prev) => prev - 1);
 
@@ -45,30 +50,35 @@ const MultiPageForm = () => {
       if (!user) {
         throw new Error('User is not authenticated.');
       }
-
-      // Verify that all fields are filled
+  
+      // Verify that all non-array fields are filled
       const allFieldsFilled = Object.values(formData).every((section) =>
         Array.isArray(section)
           ? section.every((item) => item.trim() !== '')
           : Object.values(section).every((field) => field.trim() !== '')
       );
-
-      if (!allFieldsFilled) {
-        throw new Error('Form data is incomplete.');
+  
+      // Verify that all skills and interests are selected
+      const skillsSelected = formData.skills.every((skill) => skill && skill.trim() !== '');
+      const interestsSelected = formData.interests.every((interest) => interest && interest.trim() !== '');
+  
+      if (!allFieldsFilled || !skillsSelected || !interestsSelected) {
+        throw new Error('Form data is incomplete. Please ensure all fields, skills, and interests are selected.');
       }
-
+  
       const userRef = doc(db, 'users', user.uid);
       await setDoc(userRef, { ...formData, formSubmitted: true }, { merge: true });
-
+  
       console.log('Data submitted:', formData);
-
+  
       navigation.navigate('Home');
     } catch (error) {
-      console.error('Error adding document: ', error);
+      console.error('Error adding document: ', error.message);
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handleLogout = async () => {
     try {
@@ -142,31 +152,50 @@ const MultiPageForm = () => {
         return (
           <FormSection title="Skills & Interests">
             {skills.map((skill, index) => (
-              <FormInput
-                key={index}
-                placeholder={`Skill ${index + 1}`}
-                value={skill}
-                onChangeText={(text) => {
-                  const newSkills = [...skills];
-                  newSkills[index] = text;
-                  setFormData({ ...formData, skills: newSkills });
-                }}
-              />
-            ))}
-            <AddButton onPress={() => setFormData({ ...formData, skills: [...skills, ''] })} text="+ Add Skill" />
-            {interests.map((interest, index) => (
-              <FormInput
-                key={index}
-                placeholder={`Interest ${index + 1}`}
-                value={interest}
-                onChangeText={(text) => {
-                  const newInterests = [...interests];
-                  newInterests[index] = text;
-                  setFormData({ ...formData, interests: newInterests });
-                }}
-              />
-            ))}
-            <AddButton onPress={() => setFormData({ ...formData, interests: [...interests, ''] })} text="+ Add Interest" />
+  <View style={styles.pickerContainer} key={index}>
+    <Picker
+      selectedValue={skill}
+      onValueChange={(itemValue) => {
+        const newSkills = [...skills];
+        newSkills[index] = itemValue;
+        setFormData({ ...formData, skills: newSkills });
+      }}
+      style={styles.pickerText} // Apply text color
+    >
+      {skillsList.map((skillOption, idx) => (
+        <Picker.Item label={skillOption} value={skillOption} key={idx} />
+      ))}
+    </Picker>
+  </View>
+))}
+
+<AddButton
+  onPress={() => setFormData({ ...formData, skills: [...skills, skillsList[0]] })}
+  text="+ Add Skill"
+/>
+
+{interests.map((interest, index) => (
+  <View style={styles.pickerContainer} key={index}>
+    <Picker
+      selectedValue={interest}
+      onValueChange={(itemValue) => {
+        const newInterests = [...interests];
+        newInterests[index] = itemValue;
+        setFormData({ ...formData, interests: newInterests });
+      }}
+      style={styles.pickerText} // Apply text color
+    >
+      {interestsList.map((interestOption, idx) => (
+        <Picker.Item label={interestOption} value={interestOption} key={idx} />
+      ))}
+    </Picker>
+  </View>
+))}
+
+<AddButton
+  onPress={() => setFormData({ ...formData, interests: [...interests, interestsList[0]] })}
+  text="+ Add Interest"
+/>
             <FormNavigation onSubmit={handleSubmit} onPrevious={handlePrevious} />
           </FormSection>
         );
@@ -255,19 +284,19 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   title: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 24,
     color: '#fff',
     marginBottom: 20,
   },
   input: {
     width: '100%',
+    height: 40,
     borderWidth: 1,
-    borderColor: '#3E3E3E',
+    borderColor: '#fff',
     borderRadius: 8,
-    padding: 10,
+    marginBottom: 12,
+    paddingHorizontal: 10,
     color: '#fff',
-    marginBottom: 15,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -276,24 +305,27 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   navButton: {
-    backgroundColor: '#00b894',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    backgroundColor: '#1E90FF',
     borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginHorizontal: 10,
   },
   navButtonText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontSize: 16,
   },
   addButton: {
-    backgroundColor: '#0984e3',
+    backgroundColor: '#1E90FF',
+    borderRadius: 8,
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 8,
-    marginTop: 10,
+    marginVertical: 10,
+    alignItems: 'center',
   },
   addButtonText: {
     color: '#fff',
+    fontSize: 16,
   },
   loadingScreen: {
     position: 'absolute',
@@ -307,8 +339,34 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     color: '#fff',
+    fontSize: 16,
     marginTop: 10,
   },
+  pickerContainer: {
+    width: '100%',
+    height: 50,
+    borderWidth: 1,
+    borderColor: '#fff',
+    borderRadius: 8,
+    marginBottom: 12,
+    justifyContent: 'center',
+    backgroundColor: '#1E90FF', // Background color for Picker
+  },
+  pickerText: {
+    color: '#fff', // Text color for Picker items
+  },
+  addButton: {
+    backgroundColor: '#FF6347', // Changed to a distinct color (Tomato) for visibility
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  addButtonText: {
+    color: '#fff',
+    fontSize: 16,
+  }
 });
 
 export default MultiPageForm;
