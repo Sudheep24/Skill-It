@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, Button, TextInput, Alert, StyleSheet } from 'react-native';
+import { View, Text, Button, Alert, StyleSheet } from 'react-native';
 import axios from 'axios';
 import ProgressBar from 'react-native-progress/Bar';
 
 const DomainPredictor = () => {
   const defaultValues = {
-    currentSkills: '4',
-    aptitudeScore: '80',
-    mathMarks: '90',
-    scienceMarks: '92',
-    interestsGoals: '3',
+    currentSkills: '34',
+    aptitudeScore: '90',
+    mathMarks: '78',
+    scienceMarks: '100',
+    interestsGoals: '2',
   };
 
   const [recommendation, setRecommendation] = useState('');
@@ -29,8 +29,8 @@ const DomainPredictor = () => {
         interests_goals: parseInt(defaultValues.interestsGoals, 10),
       };
 
-      // Use the correct IP address based on your environment
-      const API_URL = 'http://192.168.29.24:8000/predict/';
+      // Use the new API URL
+      const API_URL = 'https://domain-model-1.onrender.com/predict';
 
       console.log('Sending request to:', API_URL);
       console.log('Request body:', userData);
@@ -39,7 +39,7 @@ const DomainPredictor = () => {
 
       console.log('API response:', response.data);
 
-      setRecommendation(response.data.recommended_domain);
+      setRecommendation(response.data.recommended_domain); // Update this based on the actual response structure
     } catch (error) {
       console.error('Error fetching recommendation:', error.message);
       Alert.alert('Error', 'There was an error fetching the recommendation.');
