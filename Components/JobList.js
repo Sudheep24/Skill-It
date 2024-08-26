@@ -1,41 +1,41 @@
-    import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import JobListing from './JobListing';
+import React from "react";
+import { ScrollView, StyleSheet } from "react-native";
+import JobListing from "./JobListing";
 
 const JobList = () => {
   const jobs = [
     {
-      company: 'Amazon',
-      position: 'Full Stack Developer',
-      time: '5min',
-      logo: require('../assets/amazon.jpg'),
+      company: "Amazon",
+      position: "Full Stack Developer",
+      time: "5min",
+      logo: require("../assets/amazon.jpg"),
       requirements: [
-        'Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).',
-        'Experience with React, Angular, or Vue.js.',
+        "Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).",
+        "Experience with React, Angular, or Vue.js.",
       ],
-      experience: 'Fresher',
+      experience: "Fresher",
     },
     {
-      company: 'Microsoft',
-      position: 'Software Engineer',
-      time: '1hr',
-      logo: require('../assets/amazon.jpg'),
+      company: "Microsoft",
+      position: "Software Engineer",
+      time: "1hr",
+      logo: require("../assets/amazon.jpg"),
       requirements: [
-        'Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).',
-        'Experience with React, Angular, or Vue.js.',
+        "Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).",
+        "Experience with React, Angular, or Vue.js.",
       ],
-      experience: 'Fresher',
+      experience: "Fresher",
     },
     {
-      company: 'Google',
-      position: 'Business Analyst',
-      time: '5min',
-      logo: require('../assets/amazon.jpg'),
+      company: "Google",
+      position: "Business Analyst",
+      time: "5min",
+      logo: require("../assets/amazon.jpg"),
       requirements: [
-        'Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).',
-        'Experience with React, Angular, or Vue.js.',
+        "Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).",
+        "Experience with React, Angular, or Vue.js.",
       ],
-      experience: '1 or 2 Years',
+      experience: "1 or 2 Years",
     },
   ];
 
@@ -51,7 +51,7 @@ const JobList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
+    backgroundColor: "#000000",
     padding: 10,
   },
 });
