@@ -5,10 +5,14 @@ import {
   SafeAreaView,
   Text,
   TextInput,
-  Button,
+  TouchableOpacity,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { chatWithGemini } from "./ChatService";
+import { Ionicons } from "@expo/vector-icons";
+import parseStyledText from "./parseStyledText"; // Ensure correct import
 
 const Chatbot = () => {
   const [chatHistory, setChatHistory] = useState([]);
@@ -16,9 +20,8 @@ const Chatbot = () => {
   const [loading, setLoading] = useState(false);
 
   const sendMessage = async (message) => {
-    if (!message.trim()) return; // Prevent sending empty messages
+    if (!message.trim()) return;
 
-    // Add user's message to chat history
     setChatHistory((prevHistory) => [
       ...prevHistory,
       { role: "user", text: message },
@@ -29,7 +32,6 @@ const Chatbot = () => {
     try {
       const aiResponse = await chatWithGemini(message);
 
-      // Add AI's response to chat history
       setChatHistory((prevHistory) => [
         ...prevHistory,
         { role: "model", text: aiResponse },
@@ -50,38 +52,61 @@ const Chatbot = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.chatContainer}>
-        {chatHistory.map((message, index) => (
-          <View
-            key={index}
-            style={
-              message.role === "user" ? styles.userMessage : styles.aiMessage
-            }
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={1}
+      >
+        <ScrollView
+          style={styles.chatContainer}
+          contentContainerStyle={{ paddingBottom: 50 }}
+        >
+          {chatHistory.map((message, index) => (
+            <View
+              key={index}
+              style={
+                message.role === "user"
+                  ? [styles.message, styles.userMessage]
+                  : [styles.message, styles.aiMessage]
+              }
+            >
+              <Text
+                style={
+                  message.role === "user"
+                    ? styles.userMessageText
+                    : styles.aiMessageText
+                }
+              >
+                {parseStyledText(message.text)}
+              </Text>
+            </View>
+          ))}
+        </ScrollView>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            value={input}
+            onChangeText={setInput}
+            placeholder="Send a message..."
+            placeholderTextColor="#A9A9A9"
+            editable={!loading}
+          />
+          <TouchableOpacity
+            onPress={() => {
+              sendMessage(input);
+              setInput("");
+            }}
+            disabled={loading}
+            style={styles.sendButton}
           >
-            <Text style={styles.messageText}>
-              {message.role === "user" ? "You: " : "AI: "}
-              {message.text}
-            </Text>
-          </View>
-        ))}
-      </ScrollView>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          value={input}
-          onChangeText={setInput}
-          placeholder="Type your message..."
-          editable={!loading}
-        />
-        <Button
-          title={loading ? "Sending..." : "Send"}
-          onPress={() => {
-            sendMessage(input);
-            setInput("");
-          }}
-          disabled={loading}
-        />
-      </View>
+            <Ionicons
+              name={loading ? "ellipsis-horizontal" : "send"}
+              size={24}
+              color="#ffffff"
+            />
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -89,39 +114,60 @@ const Chatbot = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#343541",
   },
   chatContainer: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 15,
+    paddingTop: 50,
+  },
+  message: {
+    maxWidth: "90%",
+    padding: 12,
+    borderRadius: 18,
+    marginBottom: 10,
+  },
+  userMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#10a37f",
+  },
+  aiMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#444654",
+  },
+  userMessageText: {
+    fontSize: 16,
+    color: "#ffffff",
+  },
+  aiMessageText: {
+    fontSize: 16,
+    color: "#dcdcdc",
   },
   inputContainer: {
     flexDirection: "row",
-    padding: 16,
-    backgroundColor: "#eee",
+    alignItems: "center",
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    borderTopColor: "#444654",
+    borderTopWidth: 1,
+    backgroundColor: "#40414f",
   },
   input: {
     flex: 1,
-    borderColor: "#ccc",
-    borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    marginRight: 10,
-  },
-  userMessage: {
-    backgroundColor: "#d1ffd1",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 5,
-  },
-  aiMessage: {
-    backgroundColor: "#d1d1ff",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 5,
-  },
-  messageText: {
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    backgroundColor: "#3b3c42",
+    borderRadius: 25,
     fontSize: 16,
+    color: "#ffffff",
+  },
+  sendButton: {
+    marginLeft: 10,
+    backgroundColor: "#10a37f",
+    borderRadius: 50,
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

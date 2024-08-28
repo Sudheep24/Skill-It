@@ -21,7 +21,7 @@ const HomeScreen = () => {
   const [userData, setUserData] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [dropdownVisible, setDropdownVisible] = useState(false);
-  const [layerButtonVisible, setLayerButtonVisible] = useState(false); // For the 3-layer button
+  const [layerButtonVisible, setLayerButtonVisible] = useState(false);
   const [selectedTab, setSelectedTab] = useState("recommendation");
   const navigation = useNavigation();
 
@@ -39,8 +39,14 @@ const HomeScreen = () => {
     fetchData();
   }, []);
 
+  const handleLayerButtonPress = () => {
+    setLayerButtonVisible(!layerButtonVisible);
+    setDropdownVisible(false); // Close the profile dropdown
+  };
+
   const handleProfilePhotoPress = () => {
     setDropdownVisible(!dropdownVisible);
+    setLayerButtonVisible(false); // Close the menu dropdown
   };
 
   const handleProfileOptionPress = () => {
@@ -57,10 +63,6 @@ const HomeScreen = () => {
     }
   };
 
-  const handleLayerButtonPress = () => {
-    setLayerButtonVisible(!layerButtonVisible);
-  };
-
   const handlePredictPress = () => {
     navigation.navigate("Predict");
   };
@@ -68,6 +70,25 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.navBar}>
+        {/* Menu Button */}
+        <TouchableOpacity
+          style={styles.layerButton}
+          onPress={handleLayerButtonPress}
+        >
+          <Text style={styles.layerButtonText}>Menu</Text>
+        </TouchableOpacity>
+        {layerButtonVisible && (
+          <View style={[styles.dropdownMenu, { left: 0 }]}>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={handlePredictPress}
+            >
+              <Text style={styles.dropdownText}>Predict</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Profile Button */}
         <TouchableOpacity
           style={styles.profileButton}
           onPress={handleProfilePhotoPress}
@@ -82,7 +103,7 @@ const HomeScreen = () => {
           />
         </TouchableOpacity>
         {dropdownVisible && (
-          <View style={styles.dropdownMenu}>
+          <View style={[styles.dropdownMenuProfile, { right: 0 }]}>
             <TouchableOpacity
               style={styles.dropdownItem}
               onPress={handleProfileOptionPress}
@@ -94,30 +115,6 @@ const HomeScreen = () => {
               onPress={handleSignOut}
             >
               <Text style={styles.dropdownText}>Sign Out</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* 3-Layer Button */}
-        <TouchableOpacity
-          style={styles.layerButton}
-          onPress={handleLayerButtonPress}
-        >
-          <Text style={styles.layerButtonText}>Menu</Text>
-        </TouchableOpacity>
-        {layerButtonVisible && (
-          <View style={styles.layerDropdown}>
-            <TouchableOpacity
-              style={styles.dropdownItem}
-              onPress={handlePredictPress}
-            >
-              <Text style={styles.dropdownText}>Predict</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.dropdownItem}
-              onPress={handleSignOut}
-            >
-              <Text style={styles.dropdownText}>Logout</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -210,7 +207,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   profileButton: {
-    marginRight: 20,
+    marginLeft: 30,
   },
   profileImage: {
     width: 40,
@@ -220,7 +217,19 @@ const styles = StyleSheet.create({
   },
   dropdownMenu: {
     position: "absolute",
-    top: 60,
+    top: 60, // Adjust this value if needed
+    left: 0,
+    backgroundColor: "white",
+    borderRadius: 5,
+    padding: 10,
+    elevation: 5,
+    width: 150,
+    zIndex: 1,
+  },
+  dropdownMenuProfile: {
+    position: "absolute",
+    top: 60, // Adjust this value if needed
+    right: 0,
     backgroundColor: "white",
     borderRadius: 5,
     padding: 10,
@@ -256,7 +265,7 @@ const styles = StyleSheet.create({
   },
   selectedTab: {
     textDecorationLine: "underline",
-    textDecorationColor: "#9EA58D", // Change this to your desired color
+    textDecorationColor: "#9EA58D",
   },
   selectedTabText: {
     fontWeight: "bold",
@@ -267,21 +276,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderRadius: 10,
     backgroundColor: "#9EA58D",
+    position: "relative",
   },
   layerButtonText: {
     color: "white",
     fontSize: 16,
-  },
-  layerDropdown: {
-    position: "absolute",
-    top: 60,
-    backgroundColor: "white",
-    borderRadius: 5,
-    padding: 10,
-    elevation: 5,
-    width: 100,
-    zIndex: 1,
-    right: 20, // Aligns to the right of the screen
   },
   modalContainer: {
     flex: 1,
@@ -309,7 +308,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   modalButtonText: {
-    color: "white",
+    color: "black",
     fontSize: 16,
   },
 });
