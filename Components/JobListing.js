@@ -1,7 +1,14 @@
 import React from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 
-const JobListing = ({ company, position, time, logo, requirements, experience }) => {
+const JobListing = ({
+  company,
+  position,
+  time,
+  logo,
+  requirements,
+  experience,
+}) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -18,7 +25,9 @@ const JobListing = ({ company, position, time, logo, requirements, experience })
       <View style={styles.requirements}>
         <Text style={styles.sectionTitle}>Requirements</Text>
         {requirements.map((req, index) => (
-          <Text key={index} style={styles.requirementItem}>• {req}</Text>
+          <Text key={index} style={styles.requirementItem}>
+            • {req}
+          </Text>
         ))}
       </View>
       <View style={styles.footer}>
@@ -33,17 +42,17 @@ const JobListing = ({ company, position, time, logo, requirements, experience })
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "white",
     borderRadius: 15,
     padding: 20,
     marginBottom: 20,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
     borderWidth: 1,
     elevation: 3,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 15,
   },
   logo: {
@@ -56,16 +65,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   company: {
-    color: '#333333',
-    fontWeight: 'bold',
+    color: "#333333",
+    fontWeight: "bold",
     fontSize: 18,
   },
   position: {
-    color: '#666666',
+    color: "#666666",
     fontSize: 16,
   },
   time: {
-    color: '#888888',
+    color: "#888888",
     fontSize: 14,
   },
   starButton: {
@@ -73,40 +82,40 @@ const styles = StyleSheet.create({
   },
   starText: {
     fontSize: 18,
-    color: '#FFD700',
+    color: "#FFD700",
   },
   requirements: {
     marginBottom: 20,
   },
   sectionTitle: {
-    color: '#333333',
-    fontWeight: 'bold',
+    color: "#333333",
+    fontWeight: "bold",
     marginBottom: 10,
     fontSize: 16,
   },
   requirementItem: {
-    color: '#555555',
+    color: "#555555",
     marginLeft: 10,
     fontSize: 14,
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   experience: {
-    color: '#333333',
+    color: "#333333",
     fontSize: 14,
   },
   applyButton: {
-    backgroundColor: '#1976D2',
+    backgroundColor: "#1976D2",
     paddingVertical: 8,
     paddingHorizontal: 20,
     borderRadius: 5,
   },
   applyButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
     fontSize: 14,
   },
 });

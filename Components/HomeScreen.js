@@ -1,9 +1,15 @@
-// HomeScreen.js
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, Modal, ScrollView, TouchableOpacity } from "react-native"; // Import TouchableOpacity here
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+  ScrollView,
+  Image,
+} from "react-native";
 import JobList from "./JobList";
 import GuidanceComponent from "./GuidanceComponent";
-import NavBar from "./NavBar";
 import { getAuth, signOut } from "firebase/auth";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
@@ -33,6 +39,21 @@ const HomeScreen = () => {
     fetchData();
   }, []);
 
+  const handleLayerButtonPress = () => {
+    setLayerButtonVisible(!layerButtonVisible);
+    setDropdownVisible(false); // Close the profile dropdown
+  };
+
+  const handleProfilePhotoPress = () => {
+    setDropdownVisible(!dropdownVisible);
+    setLayerButtonVisible(false); // Close the menu dropdown
+  };
+
+  const handleProfileOptionPress = () => {
+    setDropdownVisible(false);
+    navigation.navigate("Profile");
+  };
+
   const handleSignOut = async () => {
     try {
       await signOut(auth);
@@ -48,13 +69,56 @@ const HomeScreen = () => {
 
   return (
     <View style={styles.container}>
-      <NavBar
-        userData={userData}
-        setDropdownVisible={setDropdownVisible}
-        dropdownVisible={dropdownVisible}
-        setLayerButtonVisible={setLayerButtonVisible}
-        layerButtonVisible={layerButtonVisible}
-      />
+      <View style={styles.navBar}>
+        {/* Menu Button */}
+        <TouchableOpacity
+          style={styles.layerButton}
+          onPress={handleLayerButtonPress}
+        >
+          <Text style={styles.layerButtonText}>Menu</Text>
+        </TouchableOpacity>
+        {layerButtonVisible && (
+          <View style={[styles.dropdownMenu, { left: 0 }]}>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={handlePredictPress}
+            >
+              <Text style={styles.dropdownText}>Predict</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Profile Button */}
+        <TouchableOpacity
+          style={styles.profileButton}
+          onPress={handleProfilePhotoPress}
+        >
+          <Image
+            source={{
+              uri:
+                userData?.profilePhoto ||
+                "https://example.com/default-profile-photo.jpg",
+            }}
+            style={styles.profileImage}
+          />
+        </TouchableOpacity>
+        {dropdownVisible && (
+          <View style={[styles.dropdownMenuProfile, { right: 0 }]}>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={handleProfileOptionPress}
+            >
+              <Text style={styles.dropdownText}>View Profile</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.dropdownItem}
+              onPress={handleSignOut}
+            >
+              <Text style={styles.dropdownText}>Sign Out</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
 
       {/* Tab Navigation */}
       <View style={styles.tabContainer}>
@@ -135,6 +199,51 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F3F2EF", // Light grey background similar to LinkedIn
     padding: 10,
+    paddingTop: 20,
+  },
+  navBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 10,
+  },
+  profileButton: {
+    marginLeft: 30,
+  },
+  profileImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "grey",
+  },
+  dropdownMenu: {
+    position: "absolute",
+    top: 60, // Adjust this value if needed
+    left: 0,
+    backgroundColor: "white",
+    borderRadius: 5,
+    padding: 10,
+    elevation: 5,
+    width: 150,
+    zIndex: 1,
+  },
+  dropdownMenuProfile: {
+    position: "absolute",
+    top: 60, // Adjust this value if needed
+    right: 0,
+    backgroundColor: "white",
+    borderRadius: 5,
+    padding: 10,
+    elevation: 5,
+    width: 150,
+    zIndex: 1,
+  },
+  dropdownItem: {
+    paddingVertical: 10,
+  },
+  dropdownText: {
+    fontSize: 16,
+    color: "#000",
   },
   tabContainer: {
     flexDirection: "row",
@@ -166,6 +275,17 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
+  layerButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+    backgroundColor: "#9EA58D",
+    position: "relative",
+  },
+  layerButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
   modalContainer: {
     flex: 1,
     justifyContent: "center",
@@ -190,15 +310,13 @@ const styles = StyleSheet.create({
   modalButton: {
     backgroundColor: "#0A66C2",
     paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    marginTop: 20,
+    borderRadius: 5,
+    marginTop: 10,
   },
   modalButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+    color: "#fff",
     textAlign: "center",
+    fontSize: 16,
   },
 });
 

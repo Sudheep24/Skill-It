@@ -123,7 +123,7 @@ const GuidanceComponent = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#1E1E1E",
+    backgroundColor: "white",
   },
   container: {
     paddingHorizontal: 10,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    color: "white",
+    color: "black",
     marginBottom: 20,
     fontWeight: "bold",
   },
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 22,
-    color: "white",
+    color: "black",
     marginBottom: 15,
     fontWeight: "bold",
   },

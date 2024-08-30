@@ -1,5 +1,13 @@
 import React from "react";
-import { ScrollView, StyleSheet, View, Text, Image, TouchableOpacity, Linking } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Linking,
+} from "react-native";
 import JobListing from "./JobListing";
 
 // Helper function to shuffle array
@@ -15,7 +23,7 @@ const shuffleArray = (array) => {
 const JobList = () => {
   const jobs = [
     {
-      type: 'job',
+      type: "job",
       company: "Amazon",
       position: "Full Stack Developer",
       time: "5min",
@@ -27,7 +35,7 @@ const JobList = () => {
       experience: "Fresher",
     },
     {
-      type: 'job',
+      type: "job",
       company: "Microsoft",
       position: "Software Engineer",
       time: "1hr",
@@ -39,7 +47,7 @@ const JobList = () => {
       experience: "Fresher",
     },
     {
-      type: 'job',
+      type: "job",
       company: "Google",
       position: "Business Analyst",
       time: "5min",
@@ -51,21 +59,21 @@ const JobList = () => {
       experience: "1 or 2 Years",
     },
     {
-      type: 'video',
+      type: "video",
       title: "Learn Full Stack Development in 2024",
       channel: "Code Academy",
       thumbnail: require("../assets/chatbot-icon.png"),
       videoUrl: "https://www.youtube.com/watch?v=12345",
     },
     {
-      type: 'video',
+      type: "video",
       title: "JavaScript Best Practices",
       channel: "Tech Talks",
       thumbnail: require("../assets/chatbot-icon.png"),
       videoUrl: "https://www.youtube.com/watch?v=67890",
     },
     {
-      type: 'video',
+      type: "video",
       title: "React Native Tutorial for Beginners",
       channel: "Dev Journey",
       thumbnail: require("../assets/chatbot-icon.png"),
@@ -79,9 +87,9 @@ const JobList = () => {
   return (
     <ScrollView style={styles.container}>
       {combinedList.map((item, index) => {
-        if (item.type === 'job') {
+        if (item.type === "job") {
           return <JobListing key={index} {...item} />;
-        } else if (item.type === 'video') {
+        } else if (item.type === "video") {
           return (
             <View key={index} style={styles.videoCard}>
               <View style={styles.videoHeader}>
@@ -109,26 +117,26 @@ const JobList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: 15,
+    paddingHorizontal: 0,
     paddingVertical: 20,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: "white",
   },
   videoCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 12,
     marginBottom: 20,
     padding: 15,
-    borderColor: '#E0E0E0',
+    borderColor: "#E0E0E0",
     borderWidth: 1,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
     elevation: 4,
   },
   videoHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   videoThumbnail: {
     width: 120,
@@ -141,25 +149,25 @@ const styles = StyleSheet.create({
   },
   videoTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
+    fontWeight: "600",
+    color: "#333",
     marginBottom: 5,
   },
   videoChannel: {
     fontSize: 14,
-    color: '#555',
+    color: "#555",
   },
   watchButton: {
-    backgroundColor: '#0073b1', // LinkedIn blue color
+    backgroundColor: "#0073b1", // LinkedIn blue color
     paddingVertical: 8,
     paddingHorizontal: 12,
     borderRadius: 6,
     marginTop: 10,
-    alignItems: 'center',
+    alignItems: "center",
   },
   watchButtonText: {
-    color: '#FFFFFF',
-    fontWeight: '600',
+    color: "#FFFFFF",
+    fontWeight: "600",
     fontSize: 14,
   },
 });
