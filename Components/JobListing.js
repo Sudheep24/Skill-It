@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 
 const JobListing = ({ company, position, time, logo, requirements, experience }) => {
   return (
@@ -12,19 +12,15 @@ const JobListing = ({ company, position, time, logo, requirements, experience })
           <Text style={styles.time}>{time} · Hiring</Text>
         </View>
         <TouchableOpacity style={styles.starButton}>
-          <Text>★</Text>
+          <Text style={styles.starText}>★</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.requirements}>
         <Text style={styles.sectionTitle}>Requirements</Text>
-        <Text style={styles.requirementText}>Technical Skills:</Text>
         {requirements.map((req, index) => (
           <Text key={index} style={styles.requirementItem}>• {req}</Text>
         ))}
       </View>
-      <TouchableOpacity style={styles.viewMoreButton}>
-        <Text style={styles.viewMoreText}>View More</Text>
-      </TouchableOpacity>
       <View style={styles.footer}>
         <Text style={styles.experience}>Experience: {experience}</Text>
         <TouchableOpacity style={styles.applyButton}>
@@ -37,61 +33,61 @@ const JobListing = ({ company, position, time, logo, requirements, experience })
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#1E1E1E',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 15,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 15,
+    padding: 20,
+    marginBottom: 20,
+    borderColor: '#E0E0E0',
+    borderWidth: 1,
+    elevation: 3,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   logo: {
-    width: 40,
-    height: 40,
-    marginRight: 10,
+    width: 50,
+    height: 50,
+    marginRight: 15,
+    borderRadius: 5,
   },
   headerText: {
     flex: 1,
   },
   company: {
-    color: 'white',
+    color: '#333333',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
   position: {
-    color: 'white',
-    fontSize: 14,
+    color: '#666666',
+    fontSize: 16,
   },
   time: {
-    color: 'gray',
-    fontSize: 12,
+    color: '#888888',
+    fontSize: 14,
   },
   starButton: {
     padding: 5,
   },
+  starText: {
+    fontSize: 18,
+    color: '#FFD700',
+  },
   requirements: {
-    marginBottom: 10,
+    marginBottom: 20,
   },
   sectionTitle: {
-    color: 'white',
+    color: '#333333',
     fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  requirementText: {
-    color: 'white',
+    marginBottom: 10,
+    fontSize: 16,
   },
   requirementItem: {
-    color: 'white',
+    color: '#555555',
     marginLeft: 10,
-  },
-  viewMoreButton: {
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  viewMoreText: {
-    color: 'lightblue',
+    fontSize: 14,
   },
   footer: {
     flexDirection: 'row',
@@ -99,16 +95,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   experience: {
-    color: 'white',
+    color: '#333333',
+    fontSize: 14,
   },
   applyButton: {
-    backgroundColor: 'black',
-    paddingVertical: 5,
-    paddingHorizontal: 15,
+    backgroundColor: '#1976D2',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
     borderRadius: 5,
   },
   applyButtonText: {
     color: 'white',
+    fontWeight: 'bold',
+    fontSize: 14,
   },
 });
 
