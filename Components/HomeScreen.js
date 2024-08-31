@@ -7,12 +7,13 @@ import {
   Modal,
   ScrollView,
   Image,
+  TouchableWithoutFeedback,
 } from "react-native";
 import JobList from "./JobList";
 import GuidanceComponent from "./GuidanceComponent";
 import { getAuth, signOut } from "firebase/auth";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 
 const auth = getAuth();
 const db = getFirestore();
@@ -38,6 +39,14 @@ const HomeScreen = () => {
     };
     fetchData();
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      // Close dropdowns when the screen gains focus
+      setDropdownVisible(false);
+      setLayerButtonVisible(false);
+    }, [])
+  );
 
   const handleLayerButtonPress = () => {
     setLayerButtonVisible(!layerButtonVisible);
@@ -67,130 +76,150 @@ const HomeScreen = () => {
     navigation.navigate("Predict");
   };
 
+  const handleScreenTap = () => {
+    // Close dropdowns when tapping outside of them
+    setDropdownVisible(false);
+    setLayerButtonVisible(false);
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.navBar}>
-        {/* Menu Button */}
-        <TouchableOpacity
-          style={styles.layerButton}
-          onPress={handleLayerButtonPress}
-        >
-          <Text style={styles.layerButtonText}>Menu</Text>
-        </TouchableOpacity>
-        {layerButtonVisible && (
-          <View style={[styles.dropdownMenu, { left: 0 }]}>
-            <TouchableOpacity
-              style={styles.dropdownItem}
-              onPress={handlePredictPress}
-            >
-              <Text style={styles.dropdownText}>Predict</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        {/* Profile Button */}
-        <TouchableOpacity
-          style={styles.profileButton}
-          onPress={handleProfilePhotoPress}
-        >
-          <Image
-            source={{
-              uri:
-                userData?.profilePhoto ||
-                "https://example.com/default-profile-photo.jpg",
-            }}
-            style={styles.profileImage}
-          />
-        </TouchableOpacity>
-        {dropdownVisible && (
-          <View style={[styles.dropdownMenuProfile, { right: 0 }]}>
-            <TouchableOpacity
-              style={styles.dropdownItem}
-              onPress={handleProfileOptionPress}
-            >
-              <Text style={styles.dropdownText}>View Profile</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.dropdownItem}
-              onPress={handleSignOut}
-            >
-              <Text style={styles.dropdownText}>Sign Out</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
-
-      {/* Tab Navigation */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            selectedTab === "recommendation" && styles.selectedTabButton,
-          ]}
-          onPress={() => setSelectedTab("recommendation")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "recommendation" && styles.selectedTabText,
-            ]}
+    <TouchableWithoutFeedback onPress={handleScreenTap}>
+      <View style={styles.container}>
+        <View style={styles.navBar}>
+          {/* Menu Button */}
+          <TouchableOpacity
+            style={styles.layerButton}
+            onPress={handleLayerButtonPress}
           >
-            Recommendation
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.tabButton,
-            selectedTab === "guidance" && styles.selectedTabButton,
-          ]}
-          onPress={() => setSelectedTab("guidance")}
-        >
-          <Text
-            style={[
-              styles.tabText,
-              selectedTab === "guidance" && styles.selectedTabText,
-            ]}
+            <Text style={styles.layerButtonText}>Menu</Text>
+          </TouchableOpacity>
+          {layerButtonVisible && (
+            <View style={[styles.dropdownMenu, { left: 0 }]}>
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={handlePredictPress}
+              >
+                <Text style={styles.dropdownText}>Predict</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Profile Button */}
+          <TouchableOpacity
+            style={styles.profileButton}
+            onPress={handleProfilePhotoPress}
           >
-            Guidance
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Content Based on Tab Selection */}
-      {selectedTab === "recommendation" ? <JobList /> : <GuidanceComponent />}
-
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <ScrollView contentContainerStyle={styles.modalContent}>
-            {userData && (
-              <View>
-                <Text style={styles.modalTitle}>Your Details</Text>
-                <Text style={styles.modalText}>
-                  Name: {userData.personalDetails?.name}
-                </Text>
-                <Text style={styles.modalText}>
-                  Email: {userData.personalDetails?.email}
-                </Text>
-                <Text style={styles.modalText}>
-                  Date of Birth: {userData.personalDetails?.dob}
-                </Text>
-              </View>
-            )}
-            <TouchableOpacity
-              style={styles.modalButton}
-              onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.modalButtonText}>Close</Text>
-            </TouchableOpacity>
-          </ScrollView>
+            <Image
+              source={{
+                uri:
+                  userData?.profilePhoto ||
+                  "https://example.com/default-profile-photo.jpg",
+              }}
+              style={styles.profileImage}
+            />
+          </TouchableOpacity>
+          {dropdownVisible && (
+            <View style={[styles.dropdownMenuProfile, { right: 0 }]}>
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={handleProfileOptionPress}
+              >
+                <Text style={styles.dropdownText}>View Profile</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.dropdownItem}
+                onPress={handleSignOut}
+              >
+                <Text style={styles.dropdownText}>Sign Out</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-      </Modal>
-    </View>
+
+        {/* Tab Navigation */}
+        <View style={styles.tabContainer}>
+          <TouchableOpacity
+            style={[
+              styles.tabButton,
+              selectedTab === "recommendation" && styles.selectedTabButton,
+            ]}
+            onPress={() => setSelectedTab("recommendation")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === "recommendation" && styles.selectedTabText,
+              ]}
+            >
+              Recommendation
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.tabButton,
+              selectedTab === "guidance" && styles.selectedTabButton,
+            ]}
+            onPress={() => setSelectedTab("guidance")}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                selectedTab === "guidance" && styles.selectedTabText,
+              ]}
+            >
+              Guidance
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Content Based on Tab Selection */}
+        {selectedTab === "recommendation" ? (
+          <TouchableWithoutFeedback onPress={handleScreenTap}>
+            <View style={styles.contentContainer}>
+              <JobList />
+            </View>
+          </TouchableWithoutFeedback>
+        ) : (
+          <TouchableWithoutFeedback onPress={handleScreenTap}>
+            <View style={styles.contentContainer}>
+              <GuidanceComponent />
+            </View>
+          </TouchableWithoutFeedback>
+        )}
+
+        <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <ScrollView contentContainerStyle={styles.modalContent}>
+              {userData && (
+                <View>
+                  <Text style={styles.modalTitle}>Your Details</Text>
+                  <Text style={styles.modalText}>
+                    Name: {userData.personalDetails?.name}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Email: {userData.personalDetails?.email}
+                  </Text>
+                  <Text style={styles.modalText}>
+                    Date of Birth: {userData.personalDetails?.dob}
+                  </Text>
+                </View>
+              )}
+              <TouchableOpacity
+                style={styles.modalButton}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={styles.modalButtonText}>Close</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </Modal>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -275,6 +304,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
+  contentContainer: {
+    flex: 1,
+  },
   layerButton: {
     paddingVertical: 10,
     paddingHorizontal: 15,
@@ -297,9 +329,10 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     width: "80%",
+    alignItems: "center",
   },
   modalTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     marginBottom: 10,
   },
@@ -308,14 +341,14 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   modalButton: {
-    backgroundColor: "#0A66C2",
+    marginTop: 20,
     paddingVertical: 10,
-    borderRadius: 5,
-    marginTop: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: "#007BFF",
   },
   modalButtonText: {
-    color: "#fff",
-    textAlign: "center",
+    color: "white",
     fontSize: 16,
   },
 });

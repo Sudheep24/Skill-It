@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     zIndex: 1000, // Ensure it appears above other components
   },
   chatbotIcon: {
-    width: 60, // Adjust width to fit the icon size
+    width: 61, // Adjust width to fit the icon size
     height: 60, // Adjust height to fit the icon size
     borderRadius: 30, // Half of the width/height to make it round
   },

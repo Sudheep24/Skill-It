@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -27,7 +27,7 @@ const JobList = () => {
       company: "Amazon",
       position: "Full Stack Developer",
       time: "5min",
-      logo: require("../assets/amazon.jpg"),
+      logo: require("../assets/amazon.png"),
       requirements: [
         "Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).",
         "Experience with React, Angular, or Vue.js.",
@@ -39,7 +39,7 @@ const JobList = () => {
       company: "Microsoft",
       position: "Software Engineer",
       time: "1hr",
-      logo: require("../assets/amazon.jpg"),
+      logo: require("../assets/amazon.png"),
       requirements: [
         "Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).",
         "Experience with React, Angular, or Vue.js.",
@@ -51,7 +51,7 @@ const JobList = () => {
       company: "Google",
       position: "Business Analyst",
       time: "5min",
-      logo: require("../assets/amazon.jpg"),
+      logo: require("../assets/amazon.png"),
       requirements: [
         "Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).",
         "Experience with React, Angular, or Vue.js.",
@@ -81,8 +81,13 @@ const JobList = () => {
     },
   ];
 
-  // Shuffle jobs and videos
-  const combinedList = shuffleArray(jobs);
+  // State to store the shuffled list
+  const [combinedList, setCombinedList] = useState(jobs);
+
+  useEffect(() => {
+    // Shuffle jobs and videos only once when the component is mounted
+    setCombinedList(shuffleArray(jobs));
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
