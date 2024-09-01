@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { getAuth, signOut } from 'firebase/auth';
 import { Picker } from '@react-native-picker/picker';
-
 import { doc, setDoc, getFirestore } from 'firebase/firestore';
 import Navbar from './NavBar';
 
@@ -11,9 +10,9 @@ const auth = getAuth();
 const db = getFirestore();
 
 const LoadingScreen = () => (
-  <View style={styles.loadingScreen}>
+  <View className="absolute inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center">
     <ActivityIndicator size="large" color="#fff" />
-    <Text style={styles.loadingText}>Submitting...</Text>
+    <Text className="text-white text-lg mt-2">Submitting...</Text>
   </View>
 );
 
@@ -24,13 +23,12 @@ const MultiPageForm = () => {
   const [formData, setFormData] = useState({
     personalDetails: { name: '', email: '', dob: '', phone: '' },
     education10th: { marks: '', maths: '', physics: '', chemistry: '' },
-    education12th: { marks: '', maths: '', physics: '', chemistry: '' , AptitudeScore :''},
+    education12th: { marks: '', maths: '', physics: '', chemistry: '', AptitudeScore: '' },
     collegeDetails: { collegeName: '', courseBranch: '', course: '', cgpa: '' },
     skills: [''],
-    interests: [' '],
+    interests: [''],
     currentskills: [],
   });
-
   const handleChange = (section, field, value) => {
     setFormData((prev) => ({
       ...prev,
@@ -220,9 +218,7 @@ const MultiPageForm = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-  
-
+  }
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -295,46 +291,44 @@ const MultiPageForm = () => {
         return (
           <FormSection title="Skills & Interests">
             {skills.map((skill, index) => (
-  <View style={styles.pickerContainer} key={index}>
-    <Picker
-      selectedValue={skill}
-      onValueChange={(itemValue) => {
-        const newSkills = [...skills];
-        newSkills[index] = itemValue;
-        setFormData({ ...formData, skills: newSkills });
-      }}
-      style={styles.pickerText} // Apply text color
-    >
-      {skillsList.map((skillOption, idx) => (
-        <Picker.Item label={skillOption} value={skillOption} key={idx} />
-      ))}
-    </Picker>
-  </View>
-))}
+              <View className="w-full h-12 border border-blue-300 rounded-lg mb-3 bg-blue-700" key={index}>
+                <Picker
+                  selectedValue={skill}
+                  onValueChange={(itemValue) => {
+                    const newSkills = [...skills];
+                    newSkills[index] = itemValue;
+                    setFormData({ ...formData, skills: newSkills });
+                  }}
+                  className="text-white"
+                >
+                  {skillsList.map((skillOption, idx) => (
+                    <Picker.Item label={skillOption} value={skillOption} key={idx} />
+                  ))}
+                </Picker>
+              </View>
+            ))}
+            <AddButton
+              onPress={() => setFormData({ ...formData, skills: [...skills, skillsList[0]] })}
+              text="+ Add Skill"
+            />
 
-<AddButton
-  onPress={() => setFormData({ ...formData, skills: [...skills, skillsList[0]] })}
-  text="+ Add Skill"
-/>
-
-{interests.map((interest, index) => (
-  <View style={styles.pickerContainer} key={index}>
-    <Picker
-      selectedValue={interest}
-      onValueChange={(itemValue) => {
-        const newInterests = [...interests];
-        newInterests[index] = itemValue;
-        setFormData({ ...formData, interests: newInterests });
-      }}
-      style={styles.pickerText} // Apply text color
-    >
-      {interestsList.map((interestOption, idx) => (
-        <Picker.Item label={interestOption} value={interestOption} key={idx} />
-      ))}
-    </Picker>
-  </View>
-))}
-
+            {interests.map((interest, index) => (
+              <View className="w-full h-12 border border-blue-300 rounded-lg mb-3 bg-blue-700" key={index}>
+                <Picker
+                  selectedValue={interest}
+                  onValueChange={(itemValue) => {
+                    const newInterests = [...interests];
+                    newInterests[index] = itemValue;
+                    setFormData({ ...formData, interests: newInterests });
+                  }}
+                  className="text-white"
+                >
+                  {interestsList.map((interestOption, idx) => (
+                    <Picker.Item label={interestOption} value={interestOption} key={idx} />
+                  ))}
+                </Picker>
+              </View>
+            ))}
             <FormNavigation onSubmit={handleSubmit} onPrevious={handlePrevious} />
           </FormSection>
         );
@@ -344,168 +338,67 @@ const MultiPageForm = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-gray-900">
       <Navbar onLogout={handleLogout} />
-      <View style={styles.centerContainer}>
-        <ScrollView contentContainerStyle={styles.scrollViewContainer}>
-          {renderPageContent()}
-        </ScrollView>
-      </View>
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          paddingVertical: 20,
+          paddingHorizontal: 10,
+        }}
+      >
+        {renderPageContent()}
+      </ScrollView>
       {isLoading && <LoadingScreen />}
     </View>
   );
 };
 
 const FormSection = ({ title, children }) => (
-  <View style={styles.page}>
-    <Text style={styles.title}>{title}</Text>
+  <View className="w-11/12 flex items-center my-6 p-5 rounded-lg bg-gray-800">
+    <Text className="text-3xl text-white font-semibold mb-5">{title}</Text>
     {children}
   </View>
 );
 
 const FormInput = ({ placeholder, value, onChangeText }) => (
   <TextInput
-    style={styles.input}
+    className="w-full h-12 border border-blue-300 rounded-lg mb-4 px-4 text-white bg-gray-700"
     placeholder={placeholder}
-    placeholderTextColor="#7F7F7F"
+    placeholderTextColor="#9CA3AF"
     value={value}
     onChangeText={onChangeText}
   />
 );
 
 const FormNavigation = ({ onNext, onPrevious, onSubmit }) => (
-  <View style={styles.buttonContainer}>
+  <View className="flex-row justify-between w-full mt-8">
     {onPrevious && (
-      <TouchableOpacity style={styles.navButton} onPress={onPrevious}>
-        <Text style={styles.navButtonText}>Previous</Text>
+      <TouchableOpacity className="bg-blue-600 rounded-lg py-3 px-6" onPress={onPrevious}>
+        <Text className="text-white text-lg">Previous</Text>
       </TouchableOpacity>
     )}
     {onNext && (
-      <TouchableOpacity style={styles.navButton} onPress={onNext}>
-        <Text style={styles.navButtonText}>Next</Text>
+      <TouchableOpacity className="bg-blue-600 rounded-lg py-3 px-6" onPress={onNext}>
+        <Text className="text-white text-lg">Next</Text>
       </TouchableOpacity>
     )}
     {onSubmit && (
-      <TouchableOpacity style={styles.navButton} onPress={onSubmit}>
-        <Text style={styles.navButtonText}>Submit</Text>
+      <TouchableOpacity className="bg-green-600 rounded-lg py-3 px-6" onPress={onSubmit}>
+        <Text className="text-white text-lg">Submit</Text>
       </TouchableOpacity>
     )}
   </View>
 );
 
 const AddButton = ({ onPress, text }) => (
-  <TouchableOpacity style={styles.addButton} onPress={onPress}>
-    <Text style={styles.addButtonText}>{text}</Text>
+  <TouchableOpacity className="bg-green-500 rounded-lg py-3 px-6 my-4" onPress={onPress}>
+    <Text className="text-white text-lg">{text}</Text>
   </TouchableOpacity>
 );
 
 const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scrollViewContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  page: {
-    width: '80%',
-    alignItems: 'center',
-    marginVertical: 10,
-  },
-  title: {
-    fontSize: 24,
-    color: '#fff',
-    marginBottom: 20,
-  },
-  input: {
-    width: '100%',
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#fff',
-    borderRadius: 8,
-    marginBottom: 12,
-    paddingHorizontal: 10,
-    color: '#fff',
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 20,
-  },
-  navButton: {
-    backgroundColor: '#1E90FF',
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginHorizontal: 10,
-  },
-  navButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  addButton: {
-    backgroundColor: '#1E90FF',
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginVertical: 10,
-    alignItems: 'center',
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  loadingScreen: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    color: '#fff',
-    fontSize: 16,
-    marginTop: 10,
-  },
-  pickerContainer: {
-    width: '100%',
-    height: 50,
-    borderWidth: 1,
-    borderColor: '#fff',
-    borderRadius: 8,
-    marginBottom: 12,
-    justifyContent: 'center',
-    backgroundColor: '#1E90FF', // Background color for Picker
-  },
-  pickerText: {
-    color: '#fff', // Text color for Picker items
-  },
-  addButton: {
-    backgroundColor: '#FF6347', // Changed to a distinct color (Tomato) for visibility
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginVertical: 10,
-    alignItems: 'center',
-  },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 16,
-  }
-});
 
 export default MultiPageForm;
