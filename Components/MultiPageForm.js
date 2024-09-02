@@ -20,6 +20,7 @@ const MultiPageForm = () => {
   const navigation = useNavigation();
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const totalPages = 5;
   const [formData, setFormData] = useState({
     personalDetails: { name: '', email: '', dob: '', phone: '' },
     education10th: { marks: '', maths: '', physics: '', chemistry: '' },
@@ -349,9 +350,22 @@ const MultiPageForm = () => {
           paddingHorizontal: 10,
         }}
       >
+        <ProgressBar currentPage={currentPage} totalPages={totalPages} />
+
         {renderPageContent()}
       </ScrollView>
       {isLoading && <LoadingScreen />}
+    </View>
+  );
+};
+const ProgressBar = ({ currentPage, totalPages }) => {
+  const progressPercentage = (currentPage / totalPages) * 100;
+  return (
+    <View className="w-full h-4 bg-gray-700 rounded-full my-4">
+      <View
+        className="h-full bg-blue-600 rounded-full"
+        style={{ width: `${progressPercentage}%` }}
+      />
     </View>
   );
 };
