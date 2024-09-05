@@ -80,7 +80,7 @@ const ProfileScreen = () => {
 
         {/* Profile Information */}
         <View style={tw`p-5`}>
-          <Text style={tw`text-3xl text-white mb-5 font-bold`}>John Doe</Text>
+          <Text style={tw`text-3xl text-white mb-5 font-bold`}>{userData.personalDetails?.name}</Text>
           <Text style={tw`text-lg text-gray-400 mb-5`}>Software Engineer at XYZ Company</Text>
 
           {/* Personal Details Section */}
