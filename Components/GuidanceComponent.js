@@ -112,7 +112,9 @@ const GuidanceComponent = () => {
         onPress={handleChatbotPress} // Navigate to ChatbotComponent
       >
         <Image
-          source={require("../assets/chatbot-icon.png")} // Replace with your chatbot icon
+          source={{
+            uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRPYtqytSUUShobf3PDxLMbcfTYj9DmcY3P1Q&s",
+          }} // Replace with your image URL
           style={styles.chatbotIcon}
         />
       </TouchableOpacity>
@@ -178,8 +180,8 @@ const styles = StyleSheet.create({
     zIndex: 1000, // Ensure it appears above other components
   },
   chatbotIcon: {
-    width: 61, // Adjust width to fit the icon size
-    height: 60, // Adjust height to fit the icon size
+    width: 60, // Adjust width to fit the icon size
+    height: 59, // Adjust height to fit the icon size
     borderRadius: 30, // Half of the width/height to make it round
   },
 });

@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   Image,
   StyleSheet,
-  Dimensions,
 } from "react-native";
 import { getAuth } from "firebase/auth";
 import { doc, getDoc, getFirestore } from "firebase/firestore";
@@ -16,8 +15,6 @@ import tw from "twrnc"; // Tailwind React Native for styling
 
 const auth = getAuth();
 const db = getFirestore();
-
-const { width } = Dimensions.get("window"); // Get screen width
 
 const ProfileScreen = () => {
   const [userData, setUserData] = useState(null);
@@ -96,7 +93,9 @@ const ProfileScreen = () => {
 
         {/* Profile Information */}
         <View style={tw`p-5`}>
-          <Text style={tw`text-3xl text-white mb-5 font-bold`}>John Doe</Text>
+          <Text style={tw`text-3xl text-white mb-5 font-bold`}>
+            {userData.personalDetails?.name}
+          </Text>
           <Text style={tw`text-lg text-gray-400 mb-5`}>
             Software Engineer at XYZ Company
           </Text>
@@ -195,6 +194,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: "center", // Center the profile image horizontally
+    justifyContent: "center", // Center the profile image vertically (if needed)
   },
   profileImage: {
     width: 100,
@@ -205,21 +205,19 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row", // Align buttons horizontally
-    justifyContent: "space-between", // Distribute space between buttons
+    justifyContent: "space-evenly", // Evenly distribute buttons in the container
     alignItems: "center", // Center align buttons vertically
     marginTop: 40, // Add space above the button container
     paddingHorizontal: 10, // Add some padding on the sides
   },
   button: {
-    width: width * 0.28, // Fixed width for consistency
-    height: 40, // Fixed height for consistency
     backgroundColor: "#FDFDFD", // Button background color
     borderRadius: 30, // Rounded corners
     borderWidth: 1, // Border width
     borderColor: "#8F9092", // Border color
-    justifyContent: "center", // Center text vertically
-    alignItems: "center", // Center text horizontally
-    marginHorizontal: 5, // Space between buttons
+    paddingVertical: 12, // Vertical padding
+    paddingHorizontal: 20, // Horizontal padding
+    marginHorizontal: 8, // Space between buttons
     shadowColor: "#D6D7D9", // Shadow color
     shadowOffset: { width: 0, height: 4 }, // Shadow offset
     shadowOpacity: 0.25, // Shadow opacity

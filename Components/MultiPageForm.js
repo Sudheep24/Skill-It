@@ -20,11 +20,12 @@ const MultiPageForm = () => {
   const navigation = useNavigation();
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const totalPages = 5;
   const [formData, setFormData] = useState({
     personalDetails: { name: '', email: '', dob: '', phone: '' },
     education10th: { marks: '', maths: '', physics: '', chemistry: '' },
     education12th: { marks: '', maths: '', physics: '', chemistry: '', AptitudeScore: '' },
-    collegeDetails: { collegeName: '', courseBranch: '', course: '', cgpa: '' },
+    collegeDetails: { collegeName: '', degree: '', course: '', cgpa: '' },
     skills: [''],
     interests: [''],
     currentskills: [],
@@ -291,7 +292,7 @@ const MultiPageForm = () => {
         return (
           <FormSection title="Skills & Interests">
             {skills.map((skill, index) => (
-              <View className="w-full h-12 border border-blue-300 rounded-lg mb-3 bg-blue-700" key={index}>
+              <View className="w-full h-12 border border-blue-300 rounded-lg mb-3 bg-white" key={index}>
                 <Picker
                   selectedValue={skill}
                   onValueChange={(itemValue) => {
@@ -299,7 +300,7 @@ const MultiPageForm = () => {
                     newSkills[index] = itemValue;
                     setFormData({ ...formData, skills: newSkills });
                   }}
-                  className="text-white"
+                  className="text-white bg-white "
                 >
                   {skillsList.map((skillOption, idx) => (
                     <Picker.Item label={skillOption} value={skillOption} key={idx} />
@@ -313,7 +314,7 @@ const MultiPageForm = () => {
             />
 
             {interests.map((interest, index) => (
-              <View className="w-full h-12 border border-blue-300 rounded-lg mb-3 bg-blue-700" key={index}>
+              <View className="w-full h-12 border border-blue-300 rounded-lg mb-3 bg-white" key={index}>
                 <Picker
                   selectedValue={interest}
                   onValueChange={(itemValue) => {
@@ -349,9 +350,22 @@ const MultiPageForm = () => {
           paddingHorizontal: 10,
         }}
       >
+        <ProgressBar currentPage={currentPage} totalPages={totalPages} />
+
         {renderPageContent()}
       </ScrollView>
       {isLoading && <LoadingScreen />}
+    </View>
+  );
+};
+const ProgressBar = ({ currentPage, totalPages }) => {
+  const progressPercentage = (currentPage / totalPages) * 100;
+  return (
+    <View className="w-full h-4 bg-gray-700 rounded-full my-4">
+      <View
+        className="h-full bg-blue-600 rounded-full"
+        style={{ width: `${progressPercentage}%` }}
+      />
     </View>
   );
 };

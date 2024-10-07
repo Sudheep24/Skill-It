@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -27,67 +27,107 @@ const JobList = () => {
       company: "Amazon",
       position: "Full Stack Developer",
       time: "5min",
-      logo: require("../assets/amazon.png"),
+      logo: {
+        uri: "https://cdn.vox-cdn.com/thumbor/qwYo7XAE3Loy8QPMmJjRKrCLWAY=/0x0:2040x1360/1200x628/filters:focal(1020x680:1021x681)/cdn.vox-cdn.com/uploads/chorus_asset/file/23935561/acastro_STK103__04.jpg",
+      },
       requirements: [
         "Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).",
         "Experience with React, Angular, or Vue.js.",
       ],
       experience: "Fresher",
+      applyUrl: "https://www.amazon.jobs/en/jobs/123456", // Add apply URL here
     },
     {
       type: "job",
       company: "Microsoft",
       position: "Software Engineer",
       time: "1hr",
-      logo: require("../assets/amazon.png"),
+      logo: {
+        uri: "https://bsmedia.business-standard.com/_media/bs/img/article/2023-06/06/full/1686046036-9475.jpeg",
+      },
       requirements: [
         "Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).",
         "Experience with React, Angular, or Vue.js.",
       ],
       experience: "Fresher",
+      applyUrl: "https://careers.microsoft.com/virtualjobfair", // Add apply URL here
     },
     {
       type: "job",
       company: "Google",
       position: "Business Analyst",
       time: "5min",
-      logo: require("../assets/amazon.png"),
+      logo: {
+        uri: "https://cdn.vox-cdn.com/thumbor/DZh9VoCJ3ci4j3nCI-HmwWVLByk=/0x0:2040x1360/1400x1050/filters:focal(1020x680:1021x681)/cdn.vox-cdn.com/uploads/chorus_asset/file/24016885/STK093_Google_04.jpg",
+      },
       requirements: [
         "Proficiency in JavaScript, TypeScript, and at least one backend language (e.g., Java, Python, Node.js).",
         "Experience with React, Angular, or Vue.js.",
       ],
       experience: "1 or 2 Years",
+      applyUrl: "https://careers.google.com/jobs/results/1234567890", // Add apply URL here
+    },
+    {
+      type: "job",
+      company: "NPTEL",
+      position: "Mobile Application Development",
+      time: "Upcoming",
+      logo: {
+        uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8VRmuwZhG40QDxM_IF9klXkzNA96GmX1z2Q&s",
+      },
+      requirements: [
+        "Experience in mobile application development.",
+        "Knowledge of React Native or Flutter.",
+      ],
+      experience: "Varies",
+      applyUrl: "https://nptel.ac.in/courses/123456789", // Add apply URL here
+    },
+    {
+      type: "job",
+      company: "Naan Mudhalvan and Open Mentor Trust",
+      position: "Free Full Stack and Software Testing Training Program",
+      time: "Ongoing",
+      logo: {
+        uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsMxxGsCr27cJafqIAAkzYPfZDKPDwfK7XpA&s",
+      },
+      requirements: [
+        "Interest in full stack development and software testing.",
+        "No prior experience required.",
+      ],
+      experience: "Beginner-friendly",
+      applyUrl: "https://example.com/training-program", // Add apply URL here
     },
     {
       type: "video",
       title: "Learn Full Stack Development in 2024",
       channel: "Code Academy",
-      thumbnail: require("../assets/chatbot-icon.png"),
+      thumbnail: {
+        uri: "https://miro.medium.com/v2/resize:fit:1400/0*cl7fc6pt1MHjIF4K.png",
+      },
       videoUrl: "https://www.youtube.com/watch?v=12345",
     },
     {
       type: "video",
       title: "JavaScript Best Practices",
       channel: "Tech Talks",
-      thumbnail: require("../assets/chatbot-icon.png"),
+      thumbnail: {
+        uri: "https://ehuwt7zd2je.exactdn.com/wp-content/uploads/2024/03/future-o-javascript.jpg",
+      },
       videoUrl: "https://www.youtube.com/watch?v=67890",
     },
     {
       type: "video",
       title: "React Native Tutorial for Beginners",
       channel: "Dev Journey",
-      thumbnail: require("../assets/chatbot-icon.png"),
+      thumbnail: {
+        uri: "https://readybytes.in/media/pages/blog/how-to-setup-react-native-localization-for-react-native-app/4081d4f11e-1680348760/1-cover.jpg",
+      },
       videoUrl: "https://www.youtube.com/watch?v=ABCDE",
     },
   ];
 
-  // State to store the shuffled list
-  const [combinedList, setCombinedList] = useState(jobs);
-
-  useEffect(() => {
-    // Shuffle jobs and videos only once when the component is mounted
-    setCombinedList(shuffleArray(jobs));
-  }, []);
+  // Shuffle jobs and videos
+  const combinedList = shuffleArray(jobs);
 
   return (
     <ScrollView style={styles.container}>
@@ -137,7 +177,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
-    elevation: 4,
   },
   videoHeader: {
     flexDirection: "row",
